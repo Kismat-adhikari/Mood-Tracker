@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Tracker</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Mood Tracker</h1>
+            <nav>
+                <button class="nav-btn active" data-view="log">Log Mood</button>
+                <button class="nav-btn" data-view="dashboard">Dashboard</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Mood Logging Section -->
+            <section id="mood-log" class="view active">
+                <div class="mood-form">
+                    <h2>How are you feeling today?</h2>
+                    <form id="mood-form">
+                        <div class="mood-options">
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="5" required>
+                                <div class="emoji">😊</div>
+                                <div class="label">Great</div>
+                            </label>
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="4">
+                                <div class="emoji">🙂</div>
+                                <div class="label">Good</div>
+                            </label>
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="3">
+                                <div class="emoji">😐</div>
+                                <div class="label">Okay</div>
+                            </label>
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="2">
+                                <div class="emoji">😔</div>
+                                <div class="label">Bad</div>
+                            </label>
+                            <label class="mood-option">
+                                <input type="radio" name="mood" value="1">
+                                <div class="emoji">😢</div>
+                                <div class="label">Terrible</div>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes (optional):</label>
+                            <textarea id="notes" name="notes" rows="4" placeholder="How was your day? What made you feel this way?"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-btn">Save Mood</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="view">
+                <div class="dashboard-grid">
+                    <div class="dashboard-item">
+                        <h3>Mood Trend</h3>
+                        <div class="chart-container">
+                            <canvas id="mood-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-item">
+                        <h3>Monthly Overview</h3>
+                        <div id="mood-calendar" class="calendar"></div>
+                    </div>
+
+                    <div class="dashboard-item">
+                        <h3>Weekly Summary</h3>
+                        <div id="sentiment-summary" class="summary-container"></div>
+                    </div>
+                </div>
+
+
+                <div class="dashboard-item mood-history">
+                    <h3>Mood History</h3>
+                    <div id="mood-entries" class="mood-entries-container">
+                        <!-- Mood entries will be dynamically added here -->
+                    </div>
+                </div>
+
+                <button id="export-btn" class="export-btn">Export Summary</button>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>

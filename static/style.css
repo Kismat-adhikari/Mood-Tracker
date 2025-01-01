@@ -1,0 +1,389 @@
+:root {
+    --primary-color: #f46464;
+    --bg-color: #1c1c1c;
+    --text-color: #ffffff;
+    --card-bg: #2a2a2a;
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.nav-btn {
+    padding: 0.8rem 2rem;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    background-color: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    font-weight: 600;
+    min-width: 120px;
+}
+
+.nav-btn:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.nav-btn.active {
+    background-color: var(--primary-color);
+}
+
+.view {
+    display: none;
+    opacity: 0;
+    transition: opacity var(--transition-speed);
+}
+
+.view.active {
+    display: block;
+    opacity: 1;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.mood-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mood-options {
+    display: flex;
+    justify-content: space-between;
+    margin: 2rem 0;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.mood-option {
+    flex: 1;
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: all var(--transition-speed);
+}
+
+.mood-option:hover {
+    background-color: rgba(244, 100, 100, 0.1);
+    transform: translateY(-2px);
+}
+
+.mood-option input {
+    display: none;
+}
+
+.emoji {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    transition: transform var(--transition-speed);
+}
+
+.mood-option:hover .emoji {
+    transform: scale(1.2);
+}
+
+.mood-option.selected {
+    background-color: var(--primary-color);
+}
+
+.label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
+    resize: none;
+    height: 120px;
+    font-family: inherit;
+    transition: border-color var(--transition-speed);
+}
+
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.submit-btn,
+.export-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.submit-btn:hover,
+.export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(244, 100, 100, 0.2);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-item {
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-item h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: transform var(--transition-speed);
+}
+
+.calendar-day:hover {
+    transform: scale(1.1);
+}
+
+.export-btn {
+    max-width: 200px;
+    margin: 2rem auto;
+    display: block;
+}
+
+.mood-history {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
+}
+
+.mood-entries-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.mood-entry {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform var(--transition-speed);
+}
+
+.mood-entry:hover {
+    transform: translateX(5px);
+}
+
+.mood-entry-emoji {
+    font-size: 1.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--card-bg);
+    border-radius: 50%;
+}
+
+.mood-entry-content {
+    flex: 1;
+}
+
+.mood-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.mood-entry-datetime {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.mood-entry-date {
+    font-weight: 500;
+}
+
+.mood-entry-time {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mood-entry-notes {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+
+/* Style the mood history container */
+
+#mood-entries {
+    overflow-y: auto;
+    max-height: 400px;
+    /* Adjust based on your design */
+    padding-right: 12px;
+    /* Space for scrollbar */
+    border-radius: 10px;
+    /* Rounded corners for the container */
+}
+
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+
+#mood-entries::-webkit-scrollbar {
+    width: 14px;
+    /* Slightly thicker scrollbar */
+    border-radius: 15px;
+    /* More rounded edges */
+}
+
+
+/* Track (background) of the scrollbar */
+
+#mood-entries::-webkit-scrollbar-track {
+    background-color: #e0e0e0;
+    /* Lighter grey background for track */
+    border-radius: 15px;
+    /* Rounded corners for track */
+}
+
+
+/* Thumb (draggable part) of the scrollbar */
+
+#mood-entries::-webkit-scrollbar-thumb {
+    background-color: #f46464;
+    /* Primary red color for thumb */
+    border-radius: 15px;
+    /* Rounded thumb */
+    border: 4px solid rgba(255, 255, 255, 0.7);
+    /* White border for more contrast */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    /* Subtle shadow for the thumb */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    /* Smooth transitions */
+}
+
+
+/* Thumb hover effect */
+
+#mood-entries::-webkit-scrollbar-thumb:hover {
+    background-color: #f43e3e;
+    /* Darker red on hover */
+    transform: scale(1.1);
+    /* Slight zoom effect on hover */
+}
+
+
+/* Firefox */
+
+#mood-entries {
+    scrollbar-width: thin;
+    /* Thin scrollbar */
+    scrollbar-color: #f46464 #e0e0e0;
+    /* Thumb and track color for Firefox */
+}
+
+
+/* Smooth scrolling effect */
+
+html {
+    scroll-behavior: smooth;
+}
