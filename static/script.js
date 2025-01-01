@@ -1,5 +1,5 @@
-let moodChart = null; // Store chart instance
-// Navigation handling
+let moodChart = null;
+
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -15,24 +15,17 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     });
 });
 
-// Mood selection handling
 document.querySelectorAll('.mood-option').forEach(option => {
     option.addEventListener('click', () => {
-        // Remove selected class from all options
         document.querySelectorAll('.mood-option').forEach(opt => {
             opt.classList.remove('selected');
         });
-
-        // Add selected class to clicked option
         option.classList.add('selected');
-
-        // Check the radio input
         const radio = option.querySelector('input[type="radio"]');
         radio.checked = true;
     });
 });
 
-// Mood form handling
 document.getElementById('mood-form').addEventListener('submit', async(e) => {
     e.preventDefault();
 
@@ -60,13 +53,11 @@ document.getElementById('mood-form').addEventListener('submit', async(e) => {
         });
 
         if (response.ok) {
-            // Reset form and selection
             document.querySelectorAll('.mood-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
             e.target.reset();
 
-            // Show success message
             const submitBtn = e.target.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
             submitBtn.textContent = 'Mood Logged! ✓';
@@ -85,14 +76,10 @@ document.getElementById('mood-form').addEventListener('submit', async(e) => {
     }
 });
 
-// Dashboard functions
 async function updateDashboard() {
-    console.log("Starting dashboard update");
     try {
         const response = await fetch('/api/mood');
-        console.log("API Response:", response);
         const data = await response.json();
-        console.log("Data received:", data);
 
         if (data.length === 0) {
             document.getElementById('dashboard').innerHTML = `
@@ -104,15 +91,12 @@ async function updateDashboard() {
             return;
         }
 
-        console.log("Updating mood chart...");
         updateMoodChart(data);
-        console.log("Updating mood calendar...");
         updateMoodCalendar(data);
-        console.log("Updating sentiment summary...");
         updateSentimentSummary(data);
         updateMoodHistory(data);
     } catch (error) {
-        console.error('Detailed Error:', error);
+        console.error('Error:', error);
         document.getElementById('dashboard').innerHTML = `
             <div class="error-state">
                 <h3>Error loading dashboard</h3>
@@ -124,16 +108,12 @@ async function updateDashboard() {
 
 function updateMoodChart(data) {
     const ctx = document.getElementById('mood-chart').getContext('2d');
-
-    // Process the data first
     const moodData = processDataForChart(data);
 
-    // Destroy existing chart if it exists
     if (moodChart) {
         moodChart.destroy();
     }
 
-    // Define mood descriptions for tooltip
     const moodDescriptions = {
         1: 'Terrible',
         2: 'Bad',
@@ -153,19 +133,19 @@ function updateMoodChart(data) {
                 backgroundColor: 'rgba(244, 100, 100, 0.1)',
                 tension: 0.4,
                 fill: true,
-                pointRadius: 6, // Larger points for better hovering
-                pointHoverRadius: 8, // Even larger on hover
-                pointBackgroundColor: '#f46464', // Match the line color
-                pointHoverBackgroundColor: '#fff', // White on hover
-                pointBorderColor: '#fff', // White border
-                pointHoverBorderColor: '#f46464' // Red border on hover
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                pointBackgroundColor: '#f46464',
+                pointHoverBackgroundColor: '#fff',
+                pointBorderColor: '#fff',
+                pointHoverBorderColor: '#f46464'
             }]
         },
         options: {
             responsive: true,
             interaction: {
-                intersect: false, // Hover anywhere on the line
-                mode: 'nearest' // Show nearest point
+                intersect: false,
+                mode: 'nearest'
             },
             plugins: {
                 legend: {
@@ -218,13 +198,12 @@ function updateMoodChart(data) {
                 }
             },
             animation: {
-                duration: 1000, // 1 second animation
+                duration: 1000,
                 easing: 'easeInOutQuart'
             }
         }
     });
 }
-
 
 let currentDate = new Date();
 
@@ -268,9 +247,6 @@ function updateMoodCalendar(data) {
     }
 }
 
-
-
-// Add event listeners for month navigation
 document.getElementById('prevMonth').addEventListener('click', () => {
     currentDate.setMonth(currentDate.getMonth() - 1);
     updateDashboard();
@@ -320,9 +296,8 @@ function updateMoodHistory(data) {
     };
 
     const container = document.getElementById('mood-entries');
-    container.innerHTML = ''; // Clear existing entries
+    container.innerHTML = '';
 
-    // Sort data by date and time in descending order
     const sortedData = [...data].sort((a, b) => {
         const dateCompare = new Date(b.date) - new Date(a.date);
         if (dateCompare !== 0) return dateCompare;
@@ -340,7 +315,6 @@ function updateMoodHistory(data) {
                     day: 'numeric'
                 });
 
-                // Convert 24h time to 12h format
                 const [hour, minute] = entry.time.split(':');
                 const timeString = new Date(0, 0, 0, hour, minute)
                     .toLocaleTimeString('en-US', {
@@ -377,22 +351,42 @@ function processDataForChart(data) {
     };
 }
 
-// Export functionality
-document.getElementById('export-btn').addEventListener('click', async() => {
-    console.log("Export button clicked!"); // Add this to check if it's firing
-    try {
-        const response = await fetch('/api/export');
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+document.getElementById('export-btn').addEventListener('click', async () => {
+    if (!moodChart) {
+        alert('No chart data available');
+        return;
+    }
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = moodChart.canvas.width * 2;
+    tempCanvas.height = moodChart.canvas.height * 2;
+    const tempCtx = tempCanvas.getContext('2d');
+    
+    tempCtx.scale(2, 2);
+    
+    const tempChart = new Chart(tempCtx, {
+        type: moodChart.config.type,
+        data: moodChart.config.data,
+        options: {
+            ...moodChart.config.options,
+            animation: false,
+            responsive: false,
+            devicePixelRatio: 2
+        }
+    });
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    tempCanvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'mood-summary.png';
+        a.download = 'mood-trend.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Failed to export summary');
-    }
+        URL.revokeObjectURL(url);
+        tempChart.destroy();
+        tempCanvas.remove();
+    }, 'image/png', 1.0);
 });

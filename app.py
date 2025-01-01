@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import io
 import os
+import matplotlib.pyplot as plt
+import seaborn as sns
 from flask_cors import CORS
 
 
@@ -148,12 +150,11 @@ def export_summary():
         if not entries:
             return jsonify({'error': 'No data available for export'}), 404
 
-        # Prepare data for visualization
-        dates = [f"{entry['date']} {entry['time']}" for entry in entries]
-        moods = [entry['mood'] for entry in entries]
-
         # Create the chart
         plt.figure(figsize=(10, 6))
+        dates = [entry['date'] for entry in entries]
+        moods = [entry['mood'] for entry in entries]
+        
         sns.lineplot(x=dates, y=moods, marker="o", color="blue")
         plt.title('30-Day Mood Trend', fontsize=14)
         plt.xlabel('Date', fontsize=12)
@@ -162,9 +163,9 @@ def export_summary():
         plt.yticks(range(1, 6), fontsize=10)
         plt.tight_layout()
 
-        # Save the chart to a buffer
+        # Save to buffer
         buf = io.BytesIO()
-        plt.savefig(buf, format='png')
+        plt.savefig(buf, format='png', dpi=300)
         buf.seek(0)
         plt.close()
 
@@ -177,6 +178,7 @@ def export_summary():
     except Exception as e:
         logger.error(f"Error generating export: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
