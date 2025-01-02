@@ -99,6 +99,30 @@
     </div>
 
     <script src="/static/script.js"></script>
+
+
+    <!-- Add this right before the closing </body> tag in your index.html -->
+    <div id="chart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detailed Mood Trends</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-controls">
+                    <select id="timeRange">
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="all">All Time</option>
+                </select>
+                </div>
+                <div class="expanded-chart-container">
+                    <canvas id="expanded-mood-chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
