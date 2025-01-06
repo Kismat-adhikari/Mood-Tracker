@@ -1,26 +1,22 @@
-# Use a base Python image
-FROM python:3.9-slim
+FROM python:3.9
 
-# Install Rust toolchain (needed for tokenizers)
 RUN apt-get update && apt-get install -y \
-    curl \
     build-essential \
-    libssl-dev \
-    libffi-dev \
-    rustc \
+    curl \
+    software-properties-common \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up working directory
 WORKDIR /app
 
-# Copy your project files into the container
-COPY . /app
+COPY requirements.txt .
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir wheel setuptools && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Expose the port the app will run on
-EXPOSE 5000
+COPY . .
 
-# Set the entry point to start the Flask app
-CMD ["gunicorn", "api.app:app"]
+EXPOSE $PORT
+
+CMD gunicorn --bind 0.0.0.0:$PORT app:app

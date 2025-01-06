@@ -12,6 +12,11 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from flask_cors import CORS
+from dotenv import load_dotenv
+load_dotenv() 
+port = int(os.environ.get('PORT', 5000))
+
+
 
 
 app = Flask(__name__)
@@ -21,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize sentiment analysis model
 try:
-    sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetun  ed-sst-2-english")
+    sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 except Exception as e:
     logger.error(f"Failed to load sentiment analysis model: {e}")
     sentiment_analyzer = None
@@ -180,5 +185,11 @@ def export_summary():
         return jsonify({'error': 'Internal server error'}), 500
 
 
+
+
+# In get_db_connection()
+conn = sqlite3.connect(os.environ.get('DATABASE_URL')) 
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port)
