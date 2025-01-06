@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # Initialize sentiment analysis model
 try:
-    sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+    sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetun  ed-sst-2-english")
 except Exception as e:
     logger.error(f"Failed to load sentiment analysis model: {e}")
     sentiment_analyzer = None

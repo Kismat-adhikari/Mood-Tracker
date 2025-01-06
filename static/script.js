@@ -1,5 +1,10 @@
+// Global variables
 let moodChart = null;
+let selectedDate = null;
+let moodData = [];
+let currentDate = new Date();
 
+// Navigation button event listeners
 document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -15,6 +20,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
     });
 });
 
+// Mood option selection
 document.querySelectorAll('.mood-option').forEach(option => {
     option.addEventListener('click', () => {
         document.querySelectorAll('.mood-option').forEach(opt => {
@@ -26,6 +32,7 @@ document.querySelectorAll('.mood-option').forEach(option => {
     });
 });
 
+// Form submission handler
 document.getElementById('mood-form').addEventListener('submit', async(e) => {
     e.preventDefault();
 
@@ -76,6 +83,7 @@ document.getElementById('mood-form').addEventListener('submit', async(e) => {
     }
 });
 
+// Main dashboard update function
 async function updateDashboard() {
     try {
         const response = await fetch('/api/mood');
@@ -90,6 +98,9 @@ async function updateDashboard() {
             `;
             return;
         }
+
+        // Store the data globally
+        moodData = data;
 
         updateMoodChart(data);
         updateMoodCalendar(data);
@@ -106,9 +117,80 @@ async function updateDashboard() {
     }
 }
 
+// Calendar update function
+function updateMoodCalendar(data) {
+    const calendar = document.getElementById('mood-calendar');
+    calendar.innerHTML = '';
+
+    const moodColors = {
+        1: '#ff9999',
+        2: '#ffcc99',
+        3: '#ffff99',
+        4: '#99ff99',
+        5: '#99ccff'
+    };
+
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - 27);
+
+    for (let i = 0; i < 28; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+
+        const dayElement = document.createElement('div');
+        dayElement.className = 'calendar-day';
+        dayElement.textContent = date.getDate();
+
+        const moodEntry = data.find(entry => entry.date === dateStr);
+        if (moodEntry) {
+            dayElement.style.backgroundColor = moodColors[moodEntry.mood];
+            dayElement.title = `Mood: ${moodEntry.mood}/5`;
+            dayElement.dataset.date = dateStr;
+
+            if (selectedDate === dateStr) {
+                dayElement.classList.add('selected');
+            }
+        }
+
+        // Add click handler for the calendar day
+        dayElement.addEventListener('click', () => {
+            if (dayElement.dataset.date) {
+                if (selectedDate === dateStr) {
+                    selectedDate = null;
+                    document.querySelectorAll('.calendar-day').forEach(day => {
+                        day.classList.remove('selected');
+                    });
+                } else {
+                    selectedDate = dateStr;
+                    document.querySelectorAll('.calendar-day').forEach(day => {
+                        day.classList.remove('selected');
+                    });
+                    dayElement.classList.add('selected');
+                }
+
+                updateMoodChart(moodData);
+                updateMoodHistory(moodData);
+            }
+        });
+
+        calendar.appendChild(dayElement);
+    }
+}
+
+// Chart update function
 function updateMoodChart(data) {
     const ctx = document.getElementById('mood-chart').getContext('2d');
-    const moodData = processDataForChart(data);
+    let filteredData = data;
+
+    if (selectedDate) {
+        filteredData = data.filter(entry => entry.date === selectedDate);
+    } else {
+        filteredData = data.slice(-7);
+    }
+
+    const moodData = processDataForChart(filteredData);
 
     if (moodChart) {
         moodChart.destroy();
@@ -196,88 +278,12 @@ function updateMoodChart(data) {
                         color: 'rgba(255, 255, 255, 0.1)'
                     }
                 }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuart'
             }
         }
     });
 }
 
-let currentDate = new Date();
-
-function updateMonthDisplay() {
-    document.getElementById('currentMonth').textContent =
-        currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-}
-
-function updateMoodCalendar(data) {
-    const calendar = document.getElementById('mood-calendar');
-    calendar.innerHTML = '';
-
-    const moodColors = {
-        1: '#ff9999',
-        2: '#ffcc99',
-        3: '#ffff99',
-        4: '#99ff99',
-        5: '#99ccff'
-    };
-
-    const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - 27);
-
-    for (let i = 0; i < 28; i++) {
-        const date = new Date(startDate);
-        date.setDate(startDate.getDate() + i);
-        const dateStr = date.toISOString().split('T')[0];
-
-        const dayElement = document.createElement('div');
-        dayElement.className = 'calendar-day';
-        dayElement.textContent = date.getDate();
-
-        const moodEntry = data.find(entry => entry.date === dateStr);
-        if (moodEntry) {
-            dayElement.style.backgroundColor = moodColors[moodEntry.mood];
-            dayElement.title = `Mood: ${moodEntry.mood}/5`;
-        }
-
-        calendar.appendChild(dayElement);
-    }
-}
-
-document.getElementById('prevMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    updateDashboard();
-});
-
-document.getElementById('nextMonth').addEventListener('click', () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    updateDashboard();
-});
-
-function updateSentimentSummary(data) {
-    const summary = document.getElementById('sentiment-summary');
-    const recentMoods = data.slice(-7);
-
-    const averageMood = recentMoods.reduce((acc, curr) => acc + curr.mood, 0) / recentMoods.length;
-    const sentimentScore = recentMoods.reduce((acc, curr) => acc + (curr.sentiment_score || 0), 0) / recentMoods.length;
-
-    summary.innerHTML = `
-        <div class="summary-stats">
-            <div class="stat">
-                <h4>Average Mood</h4>
-                <p>${averageMood.toFixed(1)}/5</p>
-            </div>
-            <div class="stat">
-                <h4>Sentiment Score</h4>
-                <p>${(sentimentScore * 100).toFixed(0)}%</p>
-            </div>
-        </div>
-    `;
-}
-
+// History update function
 function updateMoodHistory(data) {
     const moodEmojis = {
         1: '😢',
@@ -298,11 +304,30 @@ function updateMoodHistory(data) {
     const container = document.getElementById('mood-entries');
     container.innerHTML = '';
 
-    const sortedData = [...data].sort((a, b) => {
+    let filteredData = selectedDate ?
+        data.filter(entry => entry.date === selectedDate) :
+        data;
+
+    const sortedData = [...filteredData].sort((a, b) => {
         const dateCompare = new Date(b.date) - new Date(a.date);
         if (dateCompare !== 0) return dateCompare;
         return b.time.localeCompare(a.time);
     });
+
+    if (selectedDate) {
+        const clearFilterBtn = document.createElement('button');
+        clearFilterBtn.className = 'clear-filter-btn';
+        clearFilterBtn.innerHTML = 'Clear Date Filter ×';
+        clearFilterBtn.onclick = () => {
+            selectedDate = null;
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+            updateMoodChart(moodData);
+            updateMoodHistory(moodData);
+        };
+        container.appendChild(clearFilterBtn);
+    }
 
     sortedData.forEach(entry => {
                 const entryElement = document.createElement('div');
@@ -315,7 +340,7 @@ function updateMoodHistory(data) {
                     day: 'numeric'
                 });
 
-                const [hour, minute] = entry.time.split(':');
+                const [hour, minute] = entry.time ? entry.time.split(':') : ['00', '00'];
                 const timeString = new Date(0, 0, 0, hour, minute)
                     .toLocaleTimeString('en-US', {
                         hour: 'numeric',
@@ -343,14 +368,37 @@ function updateMoodHistory(data) {
     });
 }
 
+// Sentiment summary update function
+function updateSentimentSummary(data) {
+    const summary = document.getElementById('sentiment-summary');
+    const recentMoods = data.slice(-7);
+
+    const averageMood = recentMoods.reduce((acc, curr) => acc + curr.mood, 0) / recentMoods.length;
+    const sentimentScore = recentMoods.reduce((acc, curr) => acc + (curr.sentiment_score || 0), 0) / recentMoods.length;
+
+    summary.innerHTML = `
+        <div class="summary-stats">
+            <div class="stat">
+                <h4>Average Mood</h4>
+                <p>${averageMood.toFixed(1)}/5</p>
+            </div>
+            <div class="stat">
+                <h4>Sentiment Score</h4>
+                <p>${(sentimentScore * 100).toFixed(0)}%</p>
+            </div>
+        </div>
+    `;
+}
+
+// Helper function for chart data processing
 function processDataForChart(data) {
-    const last7Days = data.slice(-7);
     return {
-        labels: last7Days.map(entry => entry.date),
-        values: last7Days.map(entry => entry.mood)
+        labels: data.map(entry => entry.date),
+        values: data.map(entry => entry.mood)
     };
 }
 
+// Export button event listener
 document.getElementById('export-btn').addEventListener('click', async () => {
     if (!moodChart) {
         alert('No chart data available');
